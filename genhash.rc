@@ -1,0 +1,8 @@
+<!DOCTYPE gui>
+<gui name="genhash" library="konq_genhash">
+<MenuBar>
+ <Menu name="tools"><text>&amp;Tools</text>
+  <Action name="generatehash"/>
+ </Menu>
+</MenuBar>
+</gui>
