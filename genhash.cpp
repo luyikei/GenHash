@@ -73,6 +73,7 @@ void GenHash::calcGenHash()
 
         // TODO QFile
         //char s[1024];
+
         // write file content
         {
             close(pipe_fd[0]);
@@ -83,6 +84,7 @@ void GenHash::calcGenHash()
             }
             close(pipe_fd[1]);
         }
+
         //read result
         {
             close(pipe_result_fd[1]);
@@ -94,6 +96,7 @@ void GenHash::calcGenHash()
 
             KMessageBox::information(part->widget(),i18n("Md5 : %1").arg(QString(QByteArray(result, 128))));
         }
+
     }else{
         calcMD5();
     }
