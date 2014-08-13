@@ -32,7 +32,6 @@ void GenHash::calcGenHash()
     QString basePath = KFileDialog::getOpenFileName(KUrl("kfiledialog:///konqueror"), i18n("*"), part->widget(), i18n("Open File To make MD5."));
 
     if (basePath.size()) {
-        QString baseString;
         QFile file(basePath);
 
         if (!file.open(QIODevice::ReadOnly))
@@ -40,11 +39,10 @@ void GenHash::calcGenHash()
             return;
         }
 
-        QTextStream in(&file);
-        in >> baseString;
+        QByteArray baseByteArray = file.readAll();
 
         KMessageBox::information(part->widget(),i18n("Md5 : %1").arg(
-                                     QString(QCryptographicHash::hash(baseString.toAscii(), QCryptographicHash::Md5).toHex())));
+                                     QString(QCryptographicHash::hash(baseByteArray, QCryptographicHash::Md5).toHex())));
     }
 
 }
