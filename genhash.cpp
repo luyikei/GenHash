@@ -28,6 +28,11 @@
 
 #include <limits.h>
 
+#include <cap-ng.h>
+
+#include "seccomp.h"
+#include <sys/prctl.h>
+
 GenHash::GenHash( QObject* parent, const QVariantList & )
     : KParts::Plugin( parent )
 {
@@ -59,6 +64,10 @@ void GenHash::sandbox_init()
 void GenHash::calcGenHash()
 {
     sandbox_init();
+
+    // cannot excute execve
+    prctl(PR_SET_NO_NEW_PRIVS, 1, 0, 0, 0);
+    kDebug() << "execve" << execve("ls",NULL,NULL);
 
     if (child_pid){
 
