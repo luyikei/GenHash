@@ -11,7 +11,10 @@
 #include <kauthorized.h>
 #include <kio/netaccess.h>
 #include <kparts/fileinfoextension.h>
+#include <kfiledialog.h>
 #include <QCryptographicHash>
+#include <QTextStream>
+
 
 GenHash::GenHash( QObject* parent, const QVariantList & )
     : KParts::Plugin( parent )
@@ -26,11 +29,20 @@ void GenHash::calcGenHash()
 {
     KParts::ReadOnlyPart * part = qobject_cast<KParts::ReadOnlyPart *>(parent());
 
-    bool ok;
-    QString baseString = KInputDialog::getText(i18nc("@title:window", "Generate MD5 Hash"),
-                                        i18n("Please enter a text to generate MD5 hash."),
-                                        "", &ok, part->widget());
-    if (ok) {
+    QString basePath = KFileDialog::getOpenFileName(KUrl("kfiledialog:///konqueror"), i18n("*"), part->widget(), i18n("Open File To make MD5."));
+
+    if (basePath.size()) {
+        QString baseString;
+        QFile file(basePath);
+
+        if (!file.open(QIODevice::ReadOnly))
+        {
+            return;
+        }
+
+        QTextStream in(&file);
+        in >> baseString;
+
         KMessageBox::information(part->widget(),i18n("Md5 : %1").arg(
                                      QString(QCryptographicHash::hash(baseString.toAscii(), QCryptographicHash::Md5).toHex())));
     }
