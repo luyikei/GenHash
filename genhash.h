@@ -26,6 +26,7 @@ private:
     int pipe_result_fd[2];
     int child_pid;
     int status;
+    char buff[1024];
 
 
 };

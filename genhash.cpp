@@ -107,6 +107,19 @@ void GenHash::calcGenHash()
         }
 
     }else{
+
+        scmp_filter_ctx ctx = seccomp_init(SCMP_ACT_KILL);
+        seccomp_rule_add(ctx, SCMP_ACT_ALLOW, SCMP_SYS(close), 0);
+        seccomp_rule_add(ctx, SCMP_ACT_ALLOW, SCMP_SYS(read), 3,
+                                   SCMP_A0(SCMP_CMP_EQ, (scmp_datum_t)pipe_fd[0]),
+                                   SCMP_A1(SCMP_CMP_EQ, (scmp_datum_t)buff),
+                                   SCMP_A2(SCMP_CMP_LE, 1024));
+        seccomp_rule_add(ctx, SCMP_ACT_ALLOW, SCMP_SYS(write), 1,
+                                    SCMP_CMP(0, SCMP_CMP_EQ, (scmp_datum_t)pipe_result_fd[1]));
+
+        seccomp_load(ctx);
+        seccomp_release(ctx);
+
         calcMD5();
     }
 }
@@ -117,11 +130,10 @@ void GenHash::calcMD5()
 
     // read result;
     {
-        char s[1024];
         int count;
         close(pipe_fd[1]);
-        while ((count = read(pipe_fd[0], &s[0], 1024)) > 0) {
-            hash.addData(s, count);
+        while ((count = read(pipe_fd[0], &buff[0], 1024)) > 0) {
+            hash.addData(buff, count);
         }
         close(pipe_fd[0]);
     }
